@@ -11,18 +11,19 @@
 #include <stdio.h>
 #include <stdint.h>
 
-struct resultEntry
+struct headerEntry
 {
-    char description[256];
-    uint64_t value;//Can it be negative?
-    char units[10];//Set to the abbreviation of units (ms, ns, MB/s, etc)
+    char headerTag[13] = "Chips&Cheese";
+    uint16_t columns;
+    //uint32_t rows;
 };
+
 
 /*
  * Writes the header of the csv, which defines table names and certain formatting rules.
  */
 
-int write_CNC_header()
+int write_CNC_header(char testName[])
 {
 
 }
@@ -35,7 +36,7 @@ int write_CNC_header()
  * @Return: 0 if successful
  */
 
-int write_CNC_contents(char testName[], struct resultEntry resultList[], int resultCount)
+int write_CNC_contents(char testName[], uint64_t resultList[], int resultCount)
 {
     return 0;
 }
