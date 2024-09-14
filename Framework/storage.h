@@ -38,6 +38,10 @@ CnCData read_CNC(char fileName[])
     FILE *file;
     if((file = fopen(fileName, "r")) == NULL) return data;
 
+    //Grab one line at a time and parse into values.  Currently limited to FP64 types
+
+
+    return data; //This shouldn't be malformed in any way
 }
 
 /*
