@@ -25,7 +25,20 @@ struct CnCData
     double resultList[];
 };
 
+/*
+ * Reads/parses the specified file and produces a CnCData struct from the data entries.
+ * @Param fileName: A char array representing the name of the file to be ingested.
+ * @return: a single CnCData struct.  testName = FAILED if the test does not parse successfully.
+ */
+CnCData read_CNC(char fileName[])
+{
+    CnCData data;
+    sprintf(data.testName, "FAILED"); //Default value is the fail condition
 
+    FILE *file;
+    if((file = fopen(fileName, "r")) == NULL) return data;
+
+}
 
 /*
  * Writes the stored list of results to a csv file with the .cnc extension
