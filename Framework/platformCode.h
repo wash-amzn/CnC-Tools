@@ -9,8 +9,6 @@
  * Purpose: This file contains all functions that interact with platform-specific functionality
  */
 
-#define _GNU_SOURCE // This is required for `CPU_ZERO`, and `CPU_SET`
-#include <pthread.h>
 #ifdef __MINGW32__
 #include <windows.h>
 int getThreadCount()
@@ -20,19 +18,20 @@ int getThreadCount()
     return sysinfo.dwNumberOfProcessors;
 }
 
-int setAffinity(pthread_t thread, int proc)
+int setAffinity(HANDLE thread, int proc)
 {
-    cpu_set_t cpuset;
-    CPU_ZERO(&cpuset);
-    CPU_SET(proc, &cpuset);
+    // This isn't guaranteed to work on systems with more than 64 processors
+    // To fix this we need to look into process groups
+    DWORD mask = 1 << proc;
 
-    return pthread_setaffinity_np(
+    return SetProcessAffinityMask(
         thread,
-        sizeof(cpu_set_t),
-        &cpuset
+        (DWORD_PTR)&mask
     );
 }
 #elif __unix__
+#define _GNU_SOURCE // This is required for `CPU_ZERO`, and `CPU_SET`
+#include <pthread.h>
 #include <unistd.h>
 int getThreadCount()
 {
