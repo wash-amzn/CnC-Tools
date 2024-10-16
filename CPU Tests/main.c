@@ -23,7 +23,7 @@ pthread_t testThreads[2];
 int main()
 {
     //Allocate 4096 bytes of storage with a 64byte alignment
-    uint64_t *data = (uint64_t *) _aligned_malloc(4096, 64);
+    uint64_t *data = (uint64_t *) aligned_alloc(4096, 64);
 
     printf("Core Coherency Test\n");
 
