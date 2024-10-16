@@ -4,8 +4,8 @@
  * Program Name: CnC Common Headers
  * File Name: timing.h
  * Date Created: January 24, 2024
- * Date Updated: August 31, 2024
- * Version: 0.4
+ * Date Updated: October 16, 2024
+ * Version: 0.5
  * Purpose: Provides a function to time the execution of the passed in function.
  */
 #ifndef timespec

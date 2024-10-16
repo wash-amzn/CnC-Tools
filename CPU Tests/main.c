@@ -2,8 +2,8 @@
  * Program Name: CoreCoherencyTest
  * File Name: main.c
  * Date Created: January 21, 2024
- * Date Updated: February 5, 2024
- * Version: 0.1.1
+ * Date Updated: October 16, 2024
+ * Version: 0.1.2
  * Purpose: Test Core-to-Core Latency of Multi-Core CPU's using Coherency checks.
  */
 
