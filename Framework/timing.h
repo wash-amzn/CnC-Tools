@@ -21,7 +21,7 @@
  * @Return: Time in nanoseconds (up to nanosecond precision).
  */
 
-uint64_t time_execution(void (*func)(int i), uint64_t iterations = 1)
+uint64_t time_execution(void (*func)(int i), uint64_t iterations)
 {
     //Only execute on positive values for iterations
     if(iterations > 0)

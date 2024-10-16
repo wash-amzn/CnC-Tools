@@ -36,7 +36,7 @@ int main()
     }
 
     printf("CPU Thread Count: %d\n", threadCount);
-    printf("Time to run %dns\n", time_execution(testFunc));
+    printf("Time to run %dns\n", time_execution(testFunc, 1));
 
     return 0;
 }
