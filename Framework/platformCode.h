@@ -10,6 +10,8 @@
  */
 
 #ifdef __MINGW32__
+// MINGW (at least on debian) expects _aligned_malloc, while gcc and clang expect aligned_alloc
+#define aligned_alloc(sz, aln) _aligned_malloc(sz, aln)
 #include <windows.h>
 int getThreadCount()
 {
