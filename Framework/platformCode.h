@@ -8,7 +8,8 @@
  * Version: 0.1
  * Purpose: This file contains all functions that interact with platform-specific functionality
  */
-#define _GNU_SOURCE // This is required for `pthread_setaffinity_np`
+
+#define _GNU_SOURCE // This is required for `CPU_ZERO`, and `CPU_SET`
 #include <pthread.h>
 #ifdef __MINGW32__
 #include <windows.h>
