@@ -7,6 +7,7 @@
  * Purpose: Test Core-to-Core Latency of Multi-Core CPU's using Coherency checks.
  */
 
+#include "platformCode.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
