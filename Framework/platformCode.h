@@ -8,6 +8,7 @@
  * Version: 0.1
  * Purpose: This file contains all functions that interact with platform-specific functionality
  */
+#define _GNU_SOURCE // This is required for `pthread_setaffinity_np`
 #include <pthread.h>
 #ifdef __MINGW32__
 #include <windows.h>
@@ -18,9 +19,17 @@ int getThreadCount()
     return sysinfo.dwNumberOfProcessors;
 }
 
-int setAffinity(pthread_t thread)
+int setAffinity(pthread_t thread, int proc)
 {
-    pthread_gethandle(thread);
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(proc, &cpuset);
+
+    return pthread_setaffinity_np(
+        thread,
+        sizeof(cpu_set_t),
+        &cpuset
+    );
 }
 #elif __unix__
 #include <unistd.h>
@@ -29,9 +38,17 @@ int getThreadCount()
     return sysconf(_SC_NPROCESSORS_ONLN);
 }
 
-int setAffinity(pthread_t thread)
+int setAffinity(pthread_t thread, int proc)
 {
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(proc, &cpuset);
 
+    return pthread_setaffinity_np(
+        thread,
+        sizeof(cpu_set_t),
+        &cpuset
+    );
 }
 #endif
 
