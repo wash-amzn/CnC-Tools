@@ -14,11 +14,6 @@
 #define aligned_alloc(sz, aln) _aligned_malloc(sz, aln)
 #include <windows.h>
 #include <pthread.h>
-int createThread(pthread_t *handle, void *(*routine)(void *), void *argument) 
-{   
-    return pthread_create(handle, NULL, routine, argument);
-}
-
 int getThreadCount()
 {
     SYSTEM_INFO sysinfo;
@@ -38,18 +33,10 @@ int setAffinity(pthread_t thread, int proc)
         (DWORD_PTR)&mask
     );
 }
-
-int joinThread(pthread_t handle, void **retval) {
-    return pthread_join(handle, retval);
-}
 #elif __unix__
 #define _GNU_SOURCE // This is required for `CPU_ZERO`, and `CPU_SET`
 #include <pthread.h>
 #include <unistd.h>
-int createThread(pthread_t *handle, void *(*routine)(void *), void *argument) 
-{
-    return pthread_create(handle, NULL, routine, argument);
-}
 
 int getThreadCount()
 {
@@ -68,11 +55,15 @@ int setAffinity(pthread_t thread, int proc)
         &cpuset
     );
 }
+#endif
+
+int createThread(pthread_t *handle, void *(*routine)(void *), void *argument) 
+{
+    return pthread_create(handle, NULL, routine, argument);
+}
 
 int joinThread(pthread_t handle, void **retval) {
     return pthread_join(handle, retval);
 }
-#endif
-
 
 #endif // PLATFORMCODE_H
