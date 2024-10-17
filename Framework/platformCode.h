@@ -14,6 +14,11 @@
 #define aligned_alloc(sz, aln) _aligned_malloc(sz, aln)
 #include <windows.h>
 #include <pthread.h>
+int createThread(pthread_t *handle, void *(*routine)(void *), void *argument) 
+{   
+    return pthread_create(handle, NULL, routine, argument);
+}
+
 int getThreadCount()
 {
     SYSTEM_INFO sysinfo;
@@ -33,10 +38,26 @@ int setAffinity(pthread_t thread, int proc)
         (DWORD_PTR)&mask
     );
 }
+
+int joinThread(pthread_t handle, void **retval) {
+    // WaitForSingleObject will return 0 if the object is "signaled", or finished in our case
+    // 0x80 (WAIT_ABANDONED) should not occur as this is not a mutex
+    // 0x102 (WAIT_TIMEOUT) cannot occur as our timeout interval is infinit
+    // 0xFFFFFFFF (WAIT_FAILED) indicates an error
+    if (WaitForSingleObject(pthread_gethandle(handle), INFINITE) != 0)
+        return 1;
+
+    return GetExitCodeThread(pthread_gethandle(handle), retval) == 0;
+}
 #elif __unix__
 #define _GNU_SOURCE // This is required for `CPU_ZERO`, and `CPU_SET`
 #include <pthread.h>
 #include <unistd.h>
+int createThread(pthread_t *handle, void *(*routine)(void *), void *argument) 
+{
+    return pthread_create(handle, NULL, routine, argument);
+}
+
 int getThreadCount()
 {
     return sysconf(_SC_NPROCESSORS_ONLN);
@@ -53,6 +74,10 @@ int setAffinity(pthread_t thread, int proc)
         sizeof(cpu_set_t),
         &cpuset
     );
+}
+
+int joinThread(pthread_t handle, void **retval) {
+    return pthread_join(handle, retval);
 }
 #endif
 
