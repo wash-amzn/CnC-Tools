@@ -4,8 +4,8 @@
  * Program Name: CnC Common Headers
  * File Name: platformCode.h
  * Date Created: January 21, 2024
- * Date Updated: October 16, 2024
- * Version: 0.2
+ * Date Updated: October 17, 2024
+ * Version: 0.3
  * Purpose: This file contains all functions that interact with platform-specific functionality
  */
 
@@ -37,6 +37,7 @@ int setAffinity(pthread_t thread, int proc)
 #define _GNU_SOURCE // This is required for `CPU_ZERO`, and `CPU_SET`
 #include <pthread.h>
 #include <unistd.h>
+
 int getThreadCount()
 {
     return sysconf(_SC_NPROCESSORS_ONLN);
@@ -56,5 +57,13 @@ int setAffinity(pthread_t thread, int proc)
 }
 #endif
 
+int createThread(pthread_t *handle, void *(*routine)(void *), void *argument) 
+{
+    return pthread_create(handle, NULL, routine, argument);
+}
+
+int joinThread(pthread_t handle, void **retval) {
+    return pthread_join(handle, retval);
+}
 
 #endif // PLATFORMCODE_H
