@@ -75,6 +75,8 @@ CnCData read_CNC(char fileName[])
         else if (pos[len - 1] == '\n')
             len -= 1;
         memcpy(data.columnNames[i], pos, len);
+        // Ensure it's null terminated
+        data.columnNames[i][len] = 0;
     }
 
     data.resultList = malloc(data.resultCount * sizeof(double));
