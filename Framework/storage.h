@@ -27,14 +27,14 @@
 const uint8_t VERSIONCODE = 1;
 
 
-struct CnCData
+typedef struct __CnCData
 {
-    uint8_t isMalformed = 1;
+    uint8_t isMalformed;
     char testName[255];
     uint32_t resultCount;
     uint32_t columnCount;
     double resultList[];
-};
+} CnCData; 
 
 /*
  * Reads/parses the specified file and produces a CnCData struct from the data entries.
@@ -43,7 +43,7 @@ struct CnCData
  */
 CnCData read_CNC(char fileName[])
 {
-    CnCData data;
+    CnCData data = { .isMalformed = 1 };
     char buffer[BUFFERLIMIT];
     char *bufferSave;
     sprintf(data.testName, "FAILED"); //Default value is the fail condition
