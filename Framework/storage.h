@@ -57,8 +57,7 @@ CnCData read_CNC(char fileName[])
     if(VERSIONCODE != atoi(strtok_r(buffer, ",", &bufferSave))) return data;
     data.resultCount = (uint32_t) atoi(strtok_r(NULL, ",", &bufferSave));
     data.columnCount = (uint32_t) atoi(strtok_r(NULL, ",", &bufferSave));
-    if(data.resultCount || data.columnCount == NULL) return data;
-
+    if((data.resultCount == 0) || (data.columnCount == 0)) return data;
 
     //Grab one line at a time and parse into values.  Currently limited to FP64 types
 
