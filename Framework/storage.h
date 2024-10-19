@@ -33,7 +33,8 @@ typedef struct __CnCData
     char testName[255];
     uint32_t resultCount;
     uint32_t columnCount;
-    double resultList[];
+    char (*columnNames)[256];
+    double *resultList;
 } CnCData; 
 
 /*
@@ -51,15 +52,39 @@ CnCData read_CNC(char fileName[])
     FILE *file;
     if((file = fopen(fileName, "r")) == NULL) return data;
 
-    fgets(buffer, BUFFERLIMIT, file);
+    if (fgets(buffer, BUFFERLIMIT, file) == NULL)
+        return data;
 
     //Parse first line for metadata
     if(VERSIONCODE != atoi(strtok_r(buffer, ",", &bufferSave))) return data;
-    data.resultCount = (uint32_t) atoi(strtok_r(NULL, ",", &bufferSave));
-    data.columnCount = (uint32_t) atoi(strtok_r(NULL, ",", &bufferSave));
+    data.resultCount = atoi(strtok_r(bufferSave, ",", &bufferSave));
+    data.columnCount = atoi(strtok_r(bufferSave, ",", &bufferSave));
     if((data.resultCount == 0) || (data.columnCount == 0)) return data;
 
+    data.columnNames = malloc(data.columnCount * sizeof(char[255]));
+    fgets(buffer, BUFFERLIMIT, file);
+    bufferSave = buffer;
+
+    // Grab each column name
+    for (int i = 0; i < data.columnCount; i++) {
+        char *pos = strtok_r(bufferSave, ",", &bufferSave);
+        int len = strlen(pos);
+        // Prevent oversized names, and remove newline
+        if (len > 255)
+            len = 255;
+        else if (pos[len - 1] == '\n')
+            len -= 1;
+        memcpy(data.columnNames[i], pos, len);
+    }
+
+    data.resultList = malloc(data.resultCount * sizeof(double));
+    fgets(buffer, BUFFERLIMIT, file);
+    bufferSave = buffer;
+
     //Grab one line at a time and parse into values.  Currently limited to FP64 types
+    for (int i = 0; i < data.resultCount; i++) {
+        data.resultList[i] = atof(strtok_r(bufferSave, ",", &bufferSave));
+    }
 
     fclose(file);
     data.isMalformed = 0; //Sets the malform check to false as the operation is complete.
@@ -76,27 +101,23 @@ CnCData read_CNC(char fileName[])
  * @Return: 0 if successful, -1 for IO error
  */
 
-int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32_t columnCount, char columnNames[][255])
+int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32_t columnCount, char *(columnNames[255]))
 {
     //This block is unfinished and does not yet handle file extension or naming properly
     FILE *file;
     if((file = fopen(testName, "w")) == NULL) return -1;
 
     //Writes the file metadata to the first row of the csv
-    fwrite(&VERSIONCODE, sizeof(VERSIONCODE), 1, file);
-    fwrite(",", sizeof(char), 1, file);
-    fwrite(&resultCount, sizeof(resultCount), 1, file);
-    fwrite(",", sizeof(char), 1, file);
-    fwrite(&columnCount, sizeof(columnCount), 1, file);
-    fwrite("\n", sizeof(char), 1, file);
-
-
+    fprintf(file, "%u,", VERSIONCODE);
+    fprintf(file, "%u,", resultCount);
+    fprintf(file, "%u\n", columnCount);
 
     //Writes the column names to the second row of the csv
     for(int i = 0; i < columnCount; i++)
     {
-        fwrite(&columnNames[i][0], sizeof(char), 255, file);
-        fwrite(",", sizeof(char), 1, file);
+        fprintf(file, "%s", columnNames[i]);
+        if (i + 1 != columnCount)
+            fprintf(file, ",");
     }
     fwrite("\n", sizeof(char), 1, file);
 
@@ -104,15 +125,16 @@ int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32
     uint16_t columnCursor = 0;
     for(int i = 0; i < resultCount; i++)
     {
-        fwrite(&resultList[i], sizeof(double), 1, file);
+        fprintf(file, "%lf", resultList[i]);
         if(columnCursor < columnCount)
         {
-            fwrite(",", sizeof(char), 1, file);
+            if (i + 1 != resultCount)
+                fprintf(file, ",");
             columnCursor++;
         }
         else
         {
-            fwrite("\n", sizeof(char), 1, file);
+            fprintf(file, "\n");
             columnCursor = 0;
         }
     }
