@@ -47,7 +47,6 @@ CnCData read_CNC(char fileName[])
     CnCData data = { .isMalformed = 1 };
     char buffer[BUFFERLIMIT];
     char *bufferSave;
-    sprintf(data.testName, "FAILED"); //Default value is the fail condition
 
     FILE *file;
     if((file = fopen(fileName, "r")) == NULL) return data;
@@ -60,6 +59,8 @@ CnCData read_CNC(char fileName[])
     data.resultCount = atoi(strtok_r(bufferSave, ",", &bufferSave));
     data.columnCount = atoi(strtok_r(bufferSave, ",", &bufferSave));
     if((data.resultCount == 0) || (data.columnCount == 0)) return data;
+    char *name = strtok_r(bufferSave, "\n", &bufferSave);
+    memcpy(&data.testName[0], name, strlen(name));
 
     data.columnNames = malloc(data.columnCount * sizeof(char[255]));
     fgets(buffer, BUFFERLIMIT, file);
@@ -112,7 +113,8 @@ int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32
     //Writes the file metadata to the first row of the csv
     fprintf(file, "%u,", VERSIONCODE);
     fprintf(file, "%u,", resultCount);
-    fprintf(file, "%u\n", columnCount);
+    fprintf(file, "%u,", columnCount);
+    fprintf(file, "%s\n", testName);
 
     //Writes the column names to the second row of the csv
     for(int i = 0; i < columnCount; i++)
