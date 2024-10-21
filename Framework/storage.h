@@ -108,7 +108,7 @@ CnCData read_CNC(char fileName[])
  * @Return: 0 if successful, -1 for IO error
  */
 
-int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32_t columnCount, char *(columnNames[256]))
+int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32_t columnCount, char (*columnNames)[256])
 {
     //This block is unfinished and does not yet handle file extension or naming properly
     FILE *file;
