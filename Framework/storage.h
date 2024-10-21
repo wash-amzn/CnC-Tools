@@ -5,7 +5,7 @@
  * File Name: storage.h
  * Date Created: February 4, 2024
  * Date Updated: October 19, 2024
- * Version: 0.2.1
+ * Version: 0.3
  * Purpose: Provides a struct for storing results and functions for file logging
  */
 #include <stdio.h>
@@ -30,7 +30,7 @@ const uint8_t VERSIONCODE = 1;
 typedef struct __CnCData
 {
     uint8_t isMalformed;
-    char testName[255];
+    char testName[256];
     uint32_t resultCount;
     uint32_t columnCount;
     char (*columnNames)[256];
@@ -56,36 +56,40 @@ CnCData read_CNC(char fileName[])
 
     //Parse first line for metadata
     if(VERSIONCODE != atoi(strtok_r(buffer, ",", &bufferSave))) return data;
-    data.resultCount = atoi(strtok_r(bufferSave, ",", &bufferSave));
-    data.columnCount = atoi(strtok_r(bufferSave, ",", &bufferSave));
+    data.resultCount = (uint32_t) atoi(strtok_r(bufferSave, ",", &bufferSave));
+    data.columnCount = (uint32_t) atoi(strtok_r(bufferSave, ",", &bufferSave));
     if((data.resultCount == 0) || (data.columnCount == 0)) return data;
     char *name = strtok_r(bufferSave, "\n", &bufferSave);
     memcpy(&data.testName[0], name, strlen(name));
 
-    data.columnNames = malloc(data.columnCount * sizeof(char[255]));
+    data.columnNames = malloc(data.columnCount * sizeof(char[256]));
     fgets(buffer, BUFFERLIMIT, file);
     bufferSave = buffer;
 
     // Grab each column name
-    for (int i = 0; i < data.columnCount; i++) {
-        char *pos = strtok_r(bufferSave, ",", &bufferSave);
-        int len = strlen(pos);
+    for (int i = 0; i < data.columnCount; i++)
+    {
+        char *token = strtok_r(bufferSave, ",", &bufferSave);
+        int len = strlen(token);
+
         // Prevent oversized names, and remove newline
-        if (len > 255)
-            len = 255;
-        else if (pos[len - 1] == '\n')
+        if (len > 256)
+            len = 256;
+        else if (token[len - 1] == '\n')
             len -= 1;
-        memcpy(data.columnNames[i], pos, len);
+        memcpy(data.columnNames[i], token, len);
+
         // Ensure it's null terminated
         data.columnNames[i][len] = 0;
     }
 
-    data.resultList = malloc(data.resultCount * sizeof(double));
+    data.resultList = (double *) malloc(data.resultCount * sizeof(double));
     fgets(buffer, BUFFERLIMIT, file);
     bufferSave = buffer;
 
     //Grab one line at a time and parse into values.  Currently limited to FP64 types
-    for (int i = 0; i < data.resultCount; i++) {
+    for (int i = 0; i < data.resultCount; i++)
+    {
         data.resultList[i] = atof(strtok_r(bufferSave, ",", &bufferSave));
     }
 
@@ -104,7 +108,7 @@ CnCData read_CNC(char fileName[])
  * @Return: 0 if successful, -1 for IO error
  */
 
-int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32_t columnCount, char *(columnNames[255]))
+int write_CNC(char testName[], double resultList[], uint32_t resultCount, uint32_t columnCount, char *(columnNames[256]))
 {
     //This block is unfinished and does not yet handle file extension or naming properly
     FILE *file;
