@@ -2,11 +2,12 @@
  * Program Name: CnC Framework Unit Tests
  * File Name: unitTests.c
  * Date Created: October 19, 2024
- * Date Updated: October 26, 2024
- * Version: 0.2
+ * Date Updated: October 27, 2024
+ * Version: 0.2.1
  * Purpose: Unit Tests for the Framework
  */
 
+#include <stdio.h>
 #include <storage.h>
 
 #define TESTNAME "UnitTest.cnc"
@@ -46,7 +47,8 @@ int main(int argc, char *argv[])
 
     int result = 0;
 
-    printf("Storage test exitted with return code %i\n", result |= testStorage(argv[1]));
+    printf("Storage test exited with return code %i\n", result |= testStorage());
+    remove(TESTNAME); //Cleans up Test Log by default.
 
     return 0;
 }
