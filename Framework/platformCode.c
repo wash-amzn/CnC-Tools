@@ -19,22 +19,23 @@ int getThreadCount()
     return sysinfo.dwNumberOfProcessors;
 }
 
-int getAffinity(pthread_t thread)
+int getAffinity(pthread_t thread, int proc)
 {
-
+    // This isn't guaranteed to work on systems with more than 64 processors
+    // To fix this we need to look into process groups
+    DWORD_PTR processMask = 1 << proc;
+    DWORD_PTR systemMask = 1 << proc;
+    GetProcessAffinityMask(pthread_gethandle(thread), &processMask, &systemMask);
+    return 0; //FINISH THIS!!!!!!!!
 }
 
 int setAffinity(pthread_t thread, int proc)
 {
-    HANDLE native_handle = pthread_gethandle(thread);
     // This isn't guaranteed to work on systems with more than 64 processors
     // To fix this we need to look into process groups
-    DWORD mask = 1 << proc;
+    DWORD_PTR mask = 1 << proc;
 
-    return !SetProcessAffinityMask(
-        native_handle,
-        (DWORD_PTR)&mask
-        );
+    return !SetProcessAffinityMask(pthread_gethandle(thread), mask);
 }
 #elif __unix__
 
@@ -43,9 +44,13 @@ int getThreadCount()
     return sysconf(_SC_NPROCESSORS_ONLN);
 }
 
-int getAffinity(pthread_t thread)
+int getAffinity(pthread_t thread, int proc)
 {
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(proc, &cpuset);
 
+    return pthread_getaffinity_np(thread, sizeof(cpu_set_t),&cpuset);
 }
 
 int setAffinity(pthread_t thread, int proc)
@@ -54,11 +59,7 @@ int setAffinity(pthread_t thread, int proc)
     CPU_ZERO(&cpuset);
     CPU_SET(proc, &cpuset);
 
-    return pthread_setaffinity_np(
-        thread,
-        sizeof(cpu_set_t),
-        &cpuset
-        );
+    return pthread_setaffinity_np(thread, sizeof(cpu_set_t),&cpuset);
 }
 #endif
 
