@@ -42,11 +42,26 @@ int testStorage()
     return 0;
 }
 
+/*
+ * Test the affinity getter/setter
+ * @Return: 0 if successful, 1 for verification failure
+ */
+
 int testAffinity()
 {
+    pthread_t thread;
+    int affinity = 1;
+
+    setAffinity(thread, affinity);
+    if(getAffinity(thread) != affinity)
+        return 1;
     return 0;
 }
 
+/*
+ * Test the timing function
+ * @Return: 0 if successful, 1 for verification failure
+ */
 int testTiming()
 {
     return 0;
