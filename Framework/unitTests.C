@@ -59,13 +59,28 @@ int testAffinity()
 }
 
 /*
+ * Just a function to occupy the cpu for a bit
+ */
+int delay(int iterations)
+{
+    volatile double a = 34.567876867;
+    volatile double b = 24.313214355;
+    for(int i; i < iterations; i++);
+    {
+        a += b;
+    }
+}
+
+/*
  * Test the timing function
  * @Return: 0 if successful, 1 for verification failure
  */
 int testTiming()
 {
-    return 0;
+    return timeExecution(delay, 1000000000);
 }
+
+
 
 int main(int argc, char *argv[])
 {
