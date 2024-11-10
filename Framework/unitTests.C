@@ -73,7 +73,7 @@ int delay(int iterations)
 
 /*
  * Test the timing function
- * @Return: 0 if successful, 1 for verification failure
+ * @Return: time in ns for execution, or 0 for failure
  */
 int testTiming()
 {
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     printf("Thread Affinity Test exited with return code %i\n", affinityResult);
 
     int timingResult = testTiming();
-    printf("Timing Test exited with return code %i\n", timingResult);
+    printf("Timing Test exited with result time of %i nanoseconds\n", timingResult);
 
     //Cleans up UnitTest.cnc by default.
     if(!remove(TESTNAME))
