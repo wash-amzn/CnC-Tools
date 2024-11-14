@@ -1,0 +1,2 @@
+add_executable(CoreCoherencyLatency main.c)
+target_link_libraries(CoreCoherencyLatency Framework pthread)
